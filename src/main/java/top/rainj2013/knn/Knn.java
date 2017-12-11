@@ -72,7 +72,7 @@ public class Knn {
 
         //取训练集中与测试数据距离最近的topK个数据，统计不同分类的个数
         Map<T, Integer> classCountMap = Maps.newHashMap();
-        distanceAndClassList.subList(0, k + 1).forEach(objects -> {
+        distanceAndClassList.subList(0, k).forEach(objects -> {
             T classification = (T)objects[1];
             Integer count = classCountMap.get(classification);
             if (count != null) {
