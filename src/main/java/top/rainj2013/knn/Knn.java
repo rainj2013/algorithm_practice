@@ -51,7 +51,7 @@ public class Knn {
             } catch (CalException e) {
                 logger.error("计算过程中发生错误！", e);
             }
-            return -1d;
+            return Double.MAX_VALUE;
         }).forEach(aDouble -> {
             T classification = labels[index.get()];
             double distance = aDouble;
