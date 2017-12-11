@@ -3,7 +3,6 @@ package top.rainj2013.util;
 import top.rainj2013.exception.CalException;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.OptionalDouble;
 
 /**
@@ -36,7 +35,13 @@ public class ArrayUtil {
         return output;
     }
 
-
+    /**
+     * 截取矩阵(数组)
+     * @param input 原数组
+     * @param startPoint 截取的起始坐标
+     * @param endPoint 截取的结束坐标
+     * @return 截取后的数组
+     */
     public static double[][] subArray (double[][] input, int[] startPoint, int[] endPoint) {
         int length = input.length;
         int startX = startPoint[0];
@@ -57,7 +62,7 @@ public class ArrayUtil {
     }
 
     /**
-     * 求一维数组平均数
+     * 求一维数组中元素的平均数
      * @param input
      * @return
      * @throws CalException
@@ -67,16 +72,4 @@ public class ArrayUtil {
         return optionalDouble.orElseThrow(CalException::new);
     }
 
-    public static void main(String[] args) {
-        double[][] trainingData = new double[][]{
-                {0d, 0d, 0d, 0d},
-                {0d, 1d, 0d, 1d},
-                {0d, 0d, 1d, 1d},
-                {0d, 1d, 1d, 0d},
-                {1d, 1d, 1d, 1d},
-                {1d, 1d, 0d, 0d},
-                {1d, 0d, 1d, 0d},
-        };
-        System.out.println(Arrays.deepToString(subArray(trainingData, new int[]{1, 0}, new int[]{5, 2})));
-    }
 }
