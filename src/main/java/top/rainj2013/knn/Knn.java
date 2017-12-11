@@ -28,7 +28,7 @@ public class Knn {
      * @param k
      * @return
      */
-    public double classify(double[] testData, double[][] trainingData, int k) {
+    public <T> T classify(double[] testData, double[][] trainingData, T[] labels, int k) {
         //训练数据的数量
         int rowCount = trainingData.length;
         //训练数据属性个数+1，因为最后一列是该行数据的分类
@@ -36,15 +36,14 @@ public class Knn {
         //制造一个与训练数据一样行数的测试数据矩阵
         double[][] testArray = ArrayUtil.tile(testData, rowCount, 1);
         Matrix testMatrix = new Matrix(testArray);
-        //把训练数据矩阵的分类那一列切掉，其他属性留下制造一个矩阵
-        Matrix trainingMatrix = new Matrix(ArrayUtil.subArray(
-                trainingData, new int[]{0, 0}, new int[]{rowCount - 1, columnCount - 2}));
+        //制造一个训练集数据矩阵
+        Matrix trainingMatrix = new Matrix(trainingData);
         //用欧氏距离计算公式
         Matrix calMatrix = testMatrix.minus(trainingMatrix);
         calMatrix = calMatrix.arrayTimes(calMatrix);
         double[][] calArray = calMatrix.getArray();
         //将测试数据与每一行训练数据的距离，以及该行训练数据对应的分类保存到一个list里
-        List<double[]> distanceAndClassList = Lists.newArrayListWithExpectedSize(rowCount);
+        List<Object[]> distanceAndClassList = Lists.newArrayListWithExpectedSize(rowCount);
         AtomicInteger index = new AtomicInteger();
         Arrays.stream(calArray).map(doubles -> {
             try {
@@ -54,15 +53,15 @@ public class Knn {
             }
             return -1d;
         }).forEach(aDouble -> {
-            double classification = trainingData[index.get()][columnCount - 1];
+            T classification = labels[index.get()];
             double distance = aDouble;
-            distanceAndClassList.add(new double[] {distance , classification});
+            distanceAndClassList.add(new Object[] {distance , classification});
             index.getAndIncrement();
         });
 
         //按照距离排序
         distanceAndClassList.sort((o1, o2) -> {
-            if (o1[0] > o2[0]) {
+            if ((double)o1[0] > (double)o2[0]) {
                 return 1;
             } else if (o1[0] == o2[0]){
                 return 0;
@@ -72,9 +71,9 @@ public class Knn {
         });
 
         //取训练集中与测试数据距离最近的topK个数据，统计不同分类的个数
-        Map<Double, Integer> classCountMap = Maps.newHashMap();
-        distanceAndClassList.subList(0, k + 1).forEach(doubles -> {
-            double classification = doubles[1];
+        Map<T, Integer> classCountMap = Maps.newHashMap();
+        distanceAndClassList.subList(0, k + 1).forEach(objects -> {
+            T classification = (T)objects[1];
             Integer count = classCountMap.get(classification);
             if (count != null) {
                 classCountMap.put(classification, ++count);
@@ -85,8 +84,8 @@ public class Knn {
 
         //将出现次数最多的分类作为训练数据的分类
         int max = 0;
-        double classification = -1d;
-        for (Map.Entry<Double, Integer> entry : classCountMap.entrySet()) {
+        T classification = null;
+        for (Map.Entry<T, Integer> entry : classCountMap.entrySet()) {
             if (entry.getValue() > max) {
                 max = entry.getValue();
                 classification = entry.getKey();
@@ -100,14 +99,18 @@ public class Knn {
 
     public static void main(String[] args) {
         Knn knn = new Knn();
-        double[][] trainingData = new double[][]{
-                {1.0, 1.1, 1},
-                {1.0, 1.0, 1},
-                {0, 0, 0},
-                {0, 0.1, 0}
+        double[] testData ={0.2, 0.2};
+        double[][] trainingData = {
+                {1.0, 1.1},
+                {1.0, 1.0},
+                {0, 0},
+                {0, 0.1}
         };
+        String[] labels = {"A", "A", "B", "B"};
 
-        System.out.println(knn.classify(new double[]{0.2, 0.2}, trainingData, 3));
+        int k = 3;
+
+        System.out.println(knn.classify(testData, trainingData, labels, k));
     }
 
 }
