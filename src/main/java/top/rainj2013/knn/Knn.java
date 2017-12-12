@@ -1,13 +1,16 @@
 package top.rainj2013.knn;
 
 import Jama.Matrix;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ResourceUtils;
 import top.rainj2013.exception.CalException;
 import top.rainj2013.util.ArrayUtil;
 
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Knn {
 
-    private Logger logger = LoggerFactory.getLogger(Knn.class);
+    private static final Logger logger = LoggerFactory.getLogger(Knn.class);
 
     /**
      * 输入测试数据、训练数据及K值，对测试数据进行分类
@@ -99,18 +102,82 @@ public class Knn {
 
     public static void main(String[] args) {
         Knn knn = new Knn();
-        double[] testData ={0.2, 0.2};
-        double[][] trainingData = {
-                {1.0, 1.1},
-                {1.0, 1.0},
-                {0, 0},
-                {0, 0.1}
-        };
-        String[] labels = {"A", "A", "B", "B"};
+        String dataFile = "classpath:data/iris/bezdekIris.data";
+        List<double[]> data = Lists.newArrayList();
+        List<String> labelList = Lists.newArrayList();
+        try(BufferedReader reader = new BufferedReader(new InputStreamReader(
+                new FileInputStream(ResourceUtils.getFile(dataFile))))) {
+
+            reader.lines().forEach(s -> {
+                if (Strings.isNullOrEmpty(s)) {
+                    return;
+                }
+                String[] tmp = s.split(",");
+                double[] line = new double[tmp.length - 1];
+                AtomicInteger index = new AtomicInteger();
+                Arrays.stream(tmp).forEach(field -> {
+                    if (index.get() == tmp.length - 1) {
+                        labelList.add(field);
+                    } else {
+                        line[index.get()] = Double.valueOf(field);
+                    }
+                    index.getAndIncrement();
+                });
+                data.add(line);
+            });
+
+        } catch (FileNotFoundException e) {
+            logger.error("file {} not found", dataFile);
+        } catch (IOException e) {
+            logger.error("read data from file:{} error", dataFile);
+        }
+
+        List<double[]> trainingDataList = Lists.newArrayList();
+        List<String> trainingDataLabelList = Lists.newArrayList();
+        List<double[]> testDataList = Lists.newArrayList();
+        List<String> testDataLabelList = Lists.newArrayList();
+        AtomicInteger index = new AtomicInteger();
+        data.forEach(doubles -> {
+            if (index.get() % 5 == 0) {
+                testDataList.add(doubles);
+                testDataLabelList.add(labelList.get(index.get()));
+            } else {
+                trainingDataList.add(doubles);
+                trainingDataLabelList.add(labelList.get(index.get()));
+            }
+            index.getAndIncrement();
+        });
+
+        double[][] trainingData = new double[trainingDataList.size()][];
+        index.set(0);
+        trainingDataList.forEach( doubles -> {
+            trainingData[index.get()] = doubles;
+            index.incrementAndGet();
+        });
+
+
+
+        String[] labels = new String[trainingDataLabelList.size()];
+        index.set(0);
+        trainingDataLabelList.forEach(label -> {
+            labels[index.get()] = label;
+            index.incrementAndGet();
+        });
 
         int k = 3;
 
-        System.out.println(knn.classify(testData, trainingData, labels, k));
+        index.set(0);
+        AtomicInteger trueCount = new AtomicInteger();
+        testDataList.forEach(testData -> {
+            String classification = knn.classify(testData, trainingData, labels, k);
+            String label = testDataLabelList.get(index.get());
+            logger.info("预测分类为: {}，实际分类为: {}", classification, label);
+            if (classification.equals(label)) {
+                trueCount.incrementAndGet();
+            }
+            index.incrementAndGet();
+        });
+        logger.info("预测准确率为: {}", trueCount.get() / (double)testDataList.size());
     }
 
 }
