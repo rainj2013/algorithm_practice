@@ -107,6 +107,7 @@ public class Knn {
 
     public static void main(String[] args) {
         Knn knn = new Knn();
+        //从文件读取iris的数据集
         String dataFile = "classpath:data/iris/bezdekIris.data";
         List<double[]> data = Lists.newArrayList();
         List<String> labelList = Lists.newArrayList();
@@ -136,6 +137,7 @@ public class Knn {
             logger.error("read data from file:{} error", dataFile);
         }
 
+        //对数据进行归一化处理
         List<double[]> normData;
         try {
             normData = MathUtil.norm(data);
@@ -144,6 +146,7 @@ public class Knn {
             return;
         }
 
+        //将数据划分训练集和测试集
         List<double[]> trainingDataList = Lists.newArrayList();
         List<String> trainingDataLabelList = Lists.newArrayList();
         List<double[]> testDataList = Lists.newArrayList();
@@ -158,16 +161,13 @@ public class Knn {
                 trainingDataLabelList.add(labelList.get(index));
             }
         });
-
         double[][] trainingData = new double[trainingDataList.size()][];
-
         IterableUtil.forEach(trainingDataList, (index, doubles) -> trainingData[index] = doubles);
-
         String[] labels = new String[trainingDataLabelList.size()];
         IterableUtil.forEach(trainingDataLabelList, (index, label) -> labels[index] = label);
 
         int k = 3;
-
+        //对测试集中的数据进行逐条分类，并计算分类的准确率
         AtomicInteger trueCount = new AtomicInteger();
         IterableUtil.forEach(testDataList, (index, testData) -> {
             String classification = knn.classify(testData, trainingData, labels, k);
