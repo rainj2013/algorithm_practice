@@ -72,4 +72,26 @@ public class ArrayUtil {
         return optionalDouble.orElseThrow(CalException::new);
     }
 
+    /**
+     * 求一维数组中元素的最大值
+     * @param input
+     * @return
+     * @throws CalException
+     */
+    public static double max(double[] input) throws CalException {
+        OptionalDouble optionalDouble = Arrays.stream(input).max();
+        return optionalDouble.orElseThrow(CalException::new);
+    }
+
+    /**
+     * 求一维数组中元素的最小值
+     * @param input
+     * @return
+     * @throws CalException
+     */
+    public static double min(double[] input) throws CalException {
+        OptionalDouble optionalDouble = Arrays.stream(input).min();
+        return optionalDouble.orElseThrow(CalException::new);
+    }
+
 }

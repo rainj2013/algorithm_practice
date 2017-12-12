@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
 import top.rainj2013.exception.CalException;
 import top.rainj2013.util.ArrayUtil;
+import top.rainj2013.util.MatrixUtil;
 
 import java.io.*;
 import java.util.Arrays;
@@ -132,12 +133,20 @@ public class Knn {
             logger.error("read data from file:{} error", dataFile);
         }
 
+        List<double[]> normData;
+        try {
+            normData = MatrixUtil.norm(data);
+        } catch (CalException e) {
+            logger.error("normalization array fail", e);
+            return;
+        }
+
         List<double[]> trainingDataList = Lists.newArrayList();
         List<String> trainingDataLabelList = Lists.newArrayList();
         List<double[]> testDataList = Lists.newArrayList();
         List<String> testDataLabelList = Lists.newArrayList();
         AtomicInteger index = new AtomicInteger();
-        data.forEach(doubles -> {
+        normData.forEach(doubles -> {
             if (index.get() % 5 == 0) {
                 testDataList.add(doubles);
                 testDataLabelList.add(labelList.get(index.get()));
