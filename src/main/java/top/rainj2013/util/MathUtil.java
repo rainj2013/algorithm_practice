@@ -6,13 +6,12 @@ import top.rainj2013.exception.CalException;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by yangyujian
  * Time: 2017/12/12 14:55
  */
-public class MatrixUtil {
+public class MathUtil {
 
     /**
      * 对矩阵中的每一列进行归一化
@@ -40,15 +39,11 @@ public class MatrixUtil {
     }
 
     public static List<double[]> norm(List<double[]> input) throws CalException {
-        AtomicInteger index = new AtomicInteger();
         double[][] inputArray = new double[input.size()][];
-        input.forEach(doubles -> {
-            inputArray[index.get()] = doubles;
-            index.getAndIncrement();
-        });
+        IterableUtil.forEach(input, (index, doubles) -> inputArray[index] = doubles);
         double[][] outputArray = norm(inputArray);
         List<double[]> outputList = Lists.newArrayListWithExpectedSize(outputArray.length);
-        Arrays.stream(outputArray).forEach(doubles -> outputList.add(doubles));
+        outputList.addAll(Arrays.asList(outputArray));
         return outputList;
     }
 }
