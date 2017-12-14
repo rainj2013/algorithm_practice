@@ -1,5 +1,10 @@
 package top.rainj2013.util;
 
+import com.google.common.collect.Maps;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -25,5 +30,11 @@ public class IterableUtil {
         for (E element : elements) {
             action.accept(index++, element);
         }
+    }
+
+    public static <T> Map<T, List<Integer>> getElementPositions(List<T> list) {
+        Map<T, List<Integer>> positionsMap = Maps.newHashMap();
+        IterableUtil.forEach(list, (index, t) -> positionsMap.computeIfAbsent(t, k -> new ArrayList<>()).add(index));
+        return positionsMap;
     }
 }

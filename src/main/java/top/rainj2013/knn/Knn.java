@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * K邻近
  * Created by yangyujian
  * Time: 2017/12/10 20:39
  */

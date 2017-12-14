@@ -46,4 +46,8 @@ public class MathUtil {
         outputList.addAll(Arrays.asList(outputArray));
         return outputList;
     }
+
+    public static double log2(double input) {
+        return Math.log(input) / Math.log(2);
+    }
 }
