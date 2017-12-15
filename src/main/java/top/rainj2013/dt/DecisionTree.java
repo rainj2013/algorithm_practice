@@ -3,6 +3,8 @@ package top.rainj2013.dt;
 import Jama.Matrix;
 import com.google.common.collect.Lists;
 import org.apache.commons.math3.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.rainj2013.util.IterableUtil;
 import top.rainj2013.util.MathUtil;
 
@@ -17,6 +19,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * Time: 2017/12/10 20:39
  */
 public class DecisionTree {
+
+    private Logger logger = LoggerFactory.getLogger(DecisionTree.class);
 
     public <T> void train(Double[][] trainingData, List<T> labels) {
         //TODO
@@ -44,7 +48,7 @@ public class DecisionTree {
             Map<Double, List<Integer>> classMap = IterableUtil.getElementPositions(colDataList);
             AtomicReference<Double> info = new AtomicReference<>(0d);
             classMap.forEach((aDouble, integers) -> {
-                double p = integers.size() / rowCount;
+                double p = integers.size() / (double)rowCount;
 
                 List<Integer> fieldClassList = Lists.newArrayList();
                 pairMap.forEach((pair, list) -> {
@@ -56,7 +60,7 @@ public class DecisionTree {
                 int[] values = new int[fieldClassList.size()];
                 IterableUtil.forEach(fieldClassList, (index, aInt) -> values[index] = aInt);
 
-                info.updateAndGet(v -> ((v + p * aInfo(values))));
+                info.updateAndGet(v -> (v + p * aInfo(values)));
             });
             infos.add(info.get());
         }
@@ -68,7 +72,7 @@ public class DecisionTree {
         long total = Arrays.stream(values).sum();
         double result = 0;
         for (int value : values) {
-            double p = value / total;
+            double p = value / (double)total;
             result -= p * MathUtil.log2(p);
         }
         return result;
@@ -80,6 +84,7 @@ public class DecisionTree {
         for (int i = 0; i < infos.size(); i++) {
             double info = infos.get(i);
             if (info < min) {
+                min = info;
                 index = i;
             }
         }
@@ -87,7 +92,24 @@ public class DecisionTree {
     }
 
     public static void main(String[] args) {
-        System.out.println(Arrays.stream(new int[]{1, 2, 3}).sum());
+        DecisionTree dt = new DecisionTree();
+        System.out.println(dt.getBestNode(new double[][]{
+                {1, 1, 1, 0},
+                {1, 1, 1, 1},
+                {2, 1, 1, 0},
+                {3, 2, 1, 0},
+                {3, 3, 2, 0},
+                {3, 3, 2, 1},
+                {2, 3, 2, 1},
+                {1, 2, 1, 0},
+                {1, 3, 2, 0},
+                {3, 2, 2, 0},
+                {1, 2, 2, 1},
+                {2, 2, 1, 1},
+                {2, 1, 2, 0},
+                {3, 2, 1, 1}}, Lists.newArrayList(0,0,1,1,1,0,1,0,1,1,1,1,1,0)));
+
+
     }
 
 }
