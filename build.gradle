@@ -25,6 +25,7 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '1.5.4.RELEASE'
     compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
     compile group: 'gov.nist.math.jama', name: 'gov.nist.math.jama', version: '1.1.1'
+    compile group: 'com.alibaba', name: 'fastjson', version: '1.2.42'
 }
 
 buildscript {

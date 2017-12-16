@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Knn {
 
-    private static final Logger logger = LoggerFactory.getLogger(Knn.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Knn.class);
 
     /**
      * 输入测试数据、训练数据及K值，对测试数据进行分类
@@ -58,7 +58,7 @@ public class Knn {
             try {
                 return Math.sqrt(ArrayUtil.avg(doubles));
             } catch (CalException e) {
-                logger.error("计算过程中发生错误！", e);
+                LOGGER.error("计算过程中发生错误！", e);
             }
             return Double.MAX_VALUE;
         }).forEach(aDouble -> {
@@ -133,9 +133,9 @@ public class Knn {
             });
 
         } catch (FileNotFoundException e) {
-            logger.error("file {} not found", dataFile);
+            LOGGER.error("file {} not found", dataFile);
         } catch (IOException e) {
-            logger.error("read data from file:{} error", dataFile);
+            LOGGER.error("read data from file:{} error", dataFile);
         }
 
         //对数据进行归一化处理
@@ -143,7 +143,7 @@ public class Knn {
         try {
             normData = MathUtil.norm(data);
         } catch (CalException e) {
-            logger.error("normalization array fail", e);
+            LOGGER.error("normalization array fail", e);
             return;
         }
 
@@ -173,12 +173,12 @@ public class Knn {
         IterableUtil.forEach(testDataList, (index, testData) -> {
             String classification = knn.classify(testData, trainingData, labels, k);
             String label = testDataLabelList.get(index);
-            logger.info("预测分类为: {}，实际分类为: {}", classification, label);
+            LOGGER.info("预测分类为: {}，实际分类为: {}", classification, label);
             if (classification.equals(label)) {
                 trueCount.incrementAndGet();
             }
         });
-        logger.info("预测准确率为: {}", trueCount.get() / (double)testDataList.size());
+        LOGGER.info("预测准确率为: {}", trueCount.get() / (double)testDataList.size());
     }
 
 }
