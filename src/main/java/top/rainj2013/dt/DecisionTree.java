@@ -201,8 +201,8 @@ public class DecisionTree {
                 {"rain",    "mid",    "high",     "true"}};
         List<String> labels = Lists.newArrayList("no","no","yes","yes","yes","no","yes","no","yes","yes","yes","yes","yes","no");
         Node<String, String> tree = dt.buildDecisionTree(trainingData, labels);
-        String[] testData = {"rain", "mid", "normal", "false"};
-
+        String[] testData = {"sunny", "cold", "high", "true"};
+        //result should be "no"
         LOGGER.info("test data: {}, predict label: {}", Arrays.toString(testData), dt.predict(tree, testData));
     }
 
